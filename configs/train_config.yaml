@@ -4,8 +4,8 @@ output_directory: "/home/ubuntu/checkpoints/train/crane_plus_pekori_act"
 config_path: "configs/crane_features.py"
 
 device: "cpu"
-training_steps: 200
-log_freq: 1
+training_steps: 20000
+log_freq: 100
 num_workers: 2
 batch_size: 2
 chunk_size: 16

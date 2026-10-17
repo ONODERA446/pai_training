@@ -117,25 +117,29 @@ def main():
 
     step = 0
     done = False
-    while not done:
-        for batch in dataloader:
-            batch = {k: (v.to(DEVICE) if isinstance(v, torch.Tensor) else v) for k, v in batch.items()}
-            # Remove the sequence_length dimension to adapt to the ACT model implementation
-            batch["observation.state"] = batch["observation.state"][:, -1, :]  # (B, D)
-            batch["observation.environment_state"] = batch["observation.environment_state"][:, -1, :]  # (B, D)
-            # action is left as is
-            loss, _ = policy.forward(batch)
-            loss.backward()
-            optimizer.step()
-            optimizer.zero_grad()
+    try:
+        while not done:
+            for batch in dataloader:
+                batch = {k: (v.to(DEVICE) if isinstance(v, torch.Tensor) else v) for k, v in batch.items()}
+                batch["observation.state"] = batch["observation.state"][:, -1, :]
+                batch["observation.environment_state"] = batch["observation.environment_state"][:, -1, :]
+                loss, loss_dict = policy.forward(batch)
+                loss.backward()
+                optimizer.step()
+                optimizer.zero_grad()
 
-            if step % LOG_FREQ == 0:
-                print(f"step: {step} loss: {loss.item():.3f}")
-                wandb.log({"loss": loss.item(), "step": step})
-            step += 1
-            if step >= TRAINING_STEPS:
-                done = True
-                break
+                if step % LOG_FREQ == 0:
+                    print(f"step: {step} loss: {loss.item():.3f} {loss_dict}")
+                    wandb.log({"loss": loss.item(), **loss_dict, "step": step})
+                if step > 0 and step % 500 == 0:
+                    policy.save_pretrained(OUTPUT_DIRECTORY)   # 500ステップごとに上書き保存
+                    print(f"checkpoint saved at step {step}")
+                step += 1
+                if step >= TRAINING_STEPS:
+                    done = True
+                    break
+    except KeyboardInterrupt:
+        print(f"interrupted at step {step}")
 
     policy.save_pretrained(OUTPUT_DIRECTORY)
     print(f"policy saved to {OUTPUT_DIRECTORY}")
