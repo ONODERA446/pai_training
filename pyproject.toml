@@ -1,6 +1,6 @@
 [project]
 authors = [{name = "Tatsuya Kamijo", email = "tatsukamijo@icloud.com"}]
-dependencies = []
+dependencies = ["wandb>=0.22"]
 name = "pai_training"
 requires-python = ">= 3.10"
 version = "0.1.0"
