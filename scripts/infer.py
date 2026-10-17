@@ -41,8 +41,15 @@ class InferenceNode(Node):
             'observation.state': torch.tensor(self.latest_joint_state, dtype=torch.float32).unsqueeze(0),  # (1, 5)
             'observation.environment_state': torch.tensor(self.latest_joint_state, dtype=torch.float32).unsqueeze(0),  # (1, 5)
         }
+        LOOKAHEAD = 2   # チャンクの何番目を使うか。0=t-0.1s, 1=t, 2=t+0.1s, 3=t+0.2s ...
         with torch.no_grad():
-            action = self.policy.select_action(obs).cpu().numpy().flatten()  # (5,)
+            batch = self.policy.normalize_inputs(dict(obs))
+            chunk = self.policy.model(batch)[0]                                   # (1, 16, 5) 正規化済み
+            chunk = self.policy.unnormalize_outputs({"action": chunk})["action"]
+            action = chunk[0, LOOKAHEAD].cpu().numpy() # (5,)
+            action[4] = chunk[0, 15, 4].item()   # グリッパーだけチャンクの最後(t+1.4s)を使う
+        print("obs:", self.latest_joint_state)
+        
         self.last_action = action
         # Publish to arm and gripper
         jt = JointTrajectory()
