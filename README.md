@@ -4,7 +4,7 @@ Physical AI講座 最終課題
 
 Gazebo上のCRANE+ V2をキーボードでテレオペしてデモンストレーションを収集し、ACT（Action Chunking with Transformers）で「お辞儀」動作を学習、閉ループ推論でロボットを動かしました。
 
-- デモ動画: 【https://www.youtube.com/watch?v=9dT5cSdn6Ew】
+- デモ動画: https://www.youtube.com/watch?v=9dT5cSdn6Ew
 - ベース: [matsuolab/pai_training](https://github.com/matsuolab/pai_training)（このリポジトリはそのフォークです）
 
 ## 概要
@@ -70,7 +70,7 @@ docker run -it --name pai-ros2 \
 ```
 
 - 6080: ブラウザから VNC でデスクトップを操作（`http://127.0.0.1:6080`、パスワード `ubuntu`）
-- 9090 / 9876: 【データセット可視化（Rerun）用】
+- 9090 / 9876: データセット可視化（Rerun）用
 
 ※ 作者は上記イメージに以下の手順を加えたものを `docker commit` して使用しました。
 
@@ -79,7 +79,7 @@ docker run -it --name pai-ros2 \
 ```bash
 # 学習・推論環境
 cd ~
-git clone --recursive https://github.com/【要記入：GitHubユーザー名】/pai_training.git
+git clone --recursive https://github.com/ONODERA446/pai_training.git
 cd pai_training
 curl -fsSL https://pixi.sh/install.sh | bash
 source ~/.bashrc
